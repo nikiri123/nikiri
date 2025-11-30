@@ -12,35 +12,44 @@
             background-color: #e6e6e6; 
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
         }
 
         /* === EL LIENZO PRINCIPAL (TU PÓSTER) === */
         .poster-container {
             position: relative; 
-            width: 90%; /* Ocupa el 90% del ancho disponible en cualquier pantalla */
-            max-width: 1000px; 
-            aspect-ratio: 700 / 990; /* Mantiene la proporción vertical del mockup */
-            margin: 20px auto; 
-            background-image: url('fondo.png'); /* ¡Fondo correcto! */
-            background-size: 100% 100%; 
+            width: 1000px; /* Ancho fijo para PC */
+            height: 1400px; /* Alto fijo basado en la proporción de 700x990 */
+            margin: 20px auto; /* Centrado en PC */
+            background-image: url('fondo.png'); /* Fondo correcto */
+            background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
             background-color: #fff;
         }
-        
-        /* === TEXTOS Y BLOQUES (Posicionamiento Absoluto y Proporcional) === */
+
+        /* === AJUSTE CRUCIAL PARA CELULAR (Evita el colapso, requiere scroll horizontal leve) === */
+        @media (max-width: 1000px) {
+            body {
+                /* Esto obliga al celular a ver el contenido a un mínimo de 1000px, 
+                   garantizando que el layout no se rompa */
+                min-width: 1000px; 
+            }
+            .poster-container {
+                width: 100%;
+                margin: 0;
+                box-shadow: none; /* Quitamos la sombra en el móvil */
+            }
+        }
+
+        /* === TEXTOS Y BLOQUES (Posicionamiento Absoluto con Píxeles Fijos) === */
         
         /* 1. Bloque de Texto Superior */
         .intro-text {
             position: absolute;
-            top: 9%; 
-            left: 33%; 
-            width: 60%;
-            font-size: 2vw; 
+            top: 130px; /* Posición X/Y ajustada para el mockup */
+            left: 350px; 
+            width: 600px;
+            font-size: 20px; /* Tamaño de fuente fijo */
             font-weight: bold;
             line-height: 1.4;
         }
@@ -48,24 +57,24 @@
         /* 2. Sección Shorts */
         .shorts-section {
             position: absolute;
-            top: 30%; /* CORREGIDO: Bajamos un poco el bloque de Shorts */
-            left: 32%;
-            width: 65%;
+            top: 400px; /* Elevamos el Shorts para darle más espacio al texto de intro */
+            left: 330px;
+            width: 600px;
         }
 
         /* 3. Sección Tops */
         .tops-section {
             position: absolute;
-            bottom: 15%; /* CORREGIDO: Subimos el bloque de Tops */
-            left: 5%;
-            width: 90%;
+            top: 850px; /* Fija la posición de los Tops debajo de los Shorts (en lugar de usar bottom) */
+            left: 50px;
+            width: 900px;
         }
 
         /* === GALERÍA Y FOTOS === */
         .gallery-row {
             display: flex;
-            gap: 2%;
-            margin-bottom: 2%;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
         .gallery-img {
@@ -79,35 +88,32 @@
         /* Fotos de Shorts */
         .shorts-section .gallery-img {
             width: 48%; 
+            max-width: 280px;
         }
 
         /* Fotos de Tops */
         .tops-section .gallery-row img {
             width: 31%; 
+            max-width: 300px;
         }
 
         /* Precio y descripción */
         .price-tag {
-            font-size: 1.8vw; 
+            font-size: 22px;
             font-weight: bold;
             font-style: italic;
         }
         .shorts-section .price-tag {
             text-align: right; 
-            margin-right: 5%;
+            margin-right: 50px;
         }
         .tops-section .price-tag {
             text-align: left;
             margin-top: 15px;
         }
 
-        /* Ajuste para pantallas grandes (Desktop) para que el texto no sea gigante */
-        @media (min-width: 800px) {
-            .intro-text { font-size: 16px; }
-            .price-tag { font-size: 18px; }
-        }
 
-        /* === LIGHTBOX (VISOR) === */
+        /* === LIGHTBOX (VISOR) - NO CAMBIA === */
         .lightbox {
             display: none;
             position: fixed;
