@@ -17,39 +17,33 @@
         /* === EL LIENZO PRINCIPAL (TU PÓSTER) === */
         .poster-container {
             position: relative; 
-            width: 1000px; /* Ancho fijo para PC */
-            height: 1400px; /* Alto fijo basado en la proporción de 700x990 */
+            width: 1000px; /* Ancho fijo */
+            height: 1400px; /* Alto fijo */
             margin: 20px auto; /* Centrado en PC */
-            background-image: url('fondo.png'); /* Fondo correcto */
+            background-image: url('fondo.png'); 
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
             background-color: #fff;
         }
 
-        /* === AJUSTE CRUCIAL PARA CELULAR (Evita el colapso, requiere scroll horizontal leve) === */
-        @media (max-width: 1000px) {
-            body {
-                /* Esto obliga al celular a ver el contenido a un mínimo de 1000px, 
-                   garantizando que el layout no se rompa */
-                min-width: 1000px; 
-            }
-            .poster-container {
-                width: 100%;
-                margin: 0;
-                box-shadow: none; /* Quitamos la sombra en el móvil */
-            }
-        }
+        /*
+           *** BLOQUE ELIMINADO ***
+           Se eliminó el bloque @media con min-width: 1000px.
+           Ahora, el navegador móvil detectará el width: 1000px y la meta tag de viewport,
+           escalando automáticamente el diseño para que quepa en la pantalla sin zoom.
+        */
+
 
         /* === TEXTOS Y BLOQUES (Posicionamiento Absoluto con Píxeles Fijos) === */
         
         /* 1. Bloque de Texto Superior */
         .intro-text {
             position: absolute;
-            top: 130px; /* Posición X/Y ajustada para el mockup */
+            top: 130px; 
             left: 350px; 
             width: 600px;
-            font-size: 20px; /* Tamaño de fuente fijo */
+            font-size: 20px; 
             font-weight: bold;
             line-height: 1.4;
         }
@@ -57,7 +51,7 @@
         /* 2. Sección Shorts */
         .shorts-section {
             position: absolute;
-            top: 400px; /* Elevamos el Shorts para darle más espacio al texto de intro */
+            top: 400px; 
             left: 330px;
             width: 600px;
         }
@@ -65,7 +59,7 @@
         /* 3. Sección Tops */
         .tops-section {
             position: absolute;
-            top: 850px; /* Fija la posición de los Tops debajo de los Shorts (en lugar de usar bottom) */
+            top: 850px; 
             left: 50px;
             width: 900px;
         }
