@@ -1,207 +1,114 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.0005.0">
-    <title>Nikiri Catalogo #2025</title>
-    <style>
-        /* === ESTILOS BASE Y CONTENEDOR === */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #e6e6e6; 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            color: #000;
-        }
+<script type="text/javascript">
+// <![CDATA[
+var speed=33; // lower number for faster
+var drops=100; // number of 'drops'
+var colour="#999"; // colour of drops (generally grey!)
 
-        /* === EL LIENZO PRINCIPAL (TU PÓSTER) === */
-        .poster-container {
-            position: relative; 
-            width: 1000px; /* Ancho fijo */
-            height: 1400px; /* Alto fijo */
-            margin: 20px auto; /* Centrado en PC */
-            background-image: url('fondo.png'); 
-            background-size: 100% 100%;
-            background-repeat: no-repeat;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-            background-color: #fff;
-        }
+/***************************\
+*   Rainy Afternoon Effect  *
+*(c)2011-13 mf2fm web-design*
+*  http://www.mf2fm.com/rv  *
+* DON'T EDIT BELOW THIS BOX *
+\***************************/
 
-        /*
-           *** BLOQUE ELIMINADO ***
-           Se eliminó el bloque @media con min-width: 1000px.
-           Ahora, el navegador móvil detectará el width: 1000px y la meta tag de viewport,
-           escalando automáticamente el diseño para que quepa en la pantalla sin zoom.
-        */
+var flks=new Array();
+var flkx=new Array();
+var flky=new Array();
+var fldy=new Array();
+var swide, shigh, boddie;
+var ie_version=(navigator.appVersion.indexOf("MSIE")!=-1)?parseFloat(navigator.appVersion.split("MSIE")[1]):false;
 
+function addLoadEvent(funky) {
+  var oldonload=window.onload;
+  if (typeof(oldonload)!='function') window.onload=funky;
+  else window.onload=function() {
+    if (oldonload) oldonload();
+    funky();
+  }
+}
 
-        /* === TEXTOS Y BLOQUES (Posicionamiento Absoluto con Píxeles Fijos) === */
-        
-        /* 1. Bloque de Texto Superior */
-        .intro-text {
-            position: absolute;
-            top: 130px; 
-            left: 350px; 
-            width: 600px;
-            font-size: 20px; 
-            font-weight: bold;
-            line-height: 1.4;
-        }
+addLoadEvent(storm);
 
-        /* 2. Sección Shorts */
-        .shorts-section {
-            position: absolute;
-            top: 400px; 
-            left: 330px;
-            width: 600px;
-        }
+function storm() { if (document.getElementById) {
+  var r1, r2;
+  boddie=document.createElement("div");
+  boddie.style.position="fixed";
+  boddie.style.top="0px";
+  boddie.style.left="0px";
+  boddie.style.width="1px";
+  boddie.style.height="1px";
+  boddie.style.overflow="visible";
+  boddie.style.backgroundColor="transparent";
+  document.body.appendChild(boddie);
+  set_width();
+  for (var i=0; i<drops; i++) {
+    flks[i]=createDiv(16, 2, "transparent");
+    r1=createDiv(6, 2, colour);
+    r1.style.top="10px";
+    r1.style.left="0px";
+    flks[i].appendChild(r1);
+    r2=createDiv(10, 2, colour);
+    r2.style.top="0px";
+    r2.style.left="0px";
+    if (ie_version && ie_version<10) r2.style.filter="alpha(opacity=25)";
+    else r2.style.opacity=0.25;
+    flks[i].appendChild(r2);
+    flkx[i]=2*Math.floor(Math.random()*swide/2);
+    flky[i]=Math.floor(Math.random()*shigh);
+    fldy[i]=2+Math.floor(Math.random()*4);
+    flks[i].style.left=flkx[i]+"px";
+    flks[i].style.top=flky[i]+"px";
+    boddie.appendChild(flks[i]);
+  }
+  setInterval("cats_and_dogs()", speed);
+}}
 
-        /* 3. Sección Tops */
-        .tops-section {
-            position: absolute;
-            top: 850px; 
-            left: 50px;
-            width: 900px;
-        }
+function createDiv(height, width, colour) {
+  var div=document.createElement("div");
+  div.style.position="absolute";
+  div.style.height=height+"px";
+  div.style.width=width+"px";
+  div.style.overflow="hidden";
+  div.style.backgroundColor=colour;
+  return (div);
+}
 
-        /* === GALERÍA Y FOTOS === */
-        .gallery-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
+window.onresize=set_width;
+function set_width() {
+  var sw_min=999999;
+  var sh_min=999999;
+  if (document.documentElement && document.documentElement.clientWidth) {
+    sw_min=document.documentElement.clientWidth;
+    sh_min=document.documentElement.clientHeight;
+  }
+  if (typeof(self.innerWidth)!="undefined" && self.innerWidth) {
+    if (self.innerWidth<sw_min) sw_min=self.innerWidth;
+    if (self.innerHeight<sh_min) sh_min=self.innerHeight;
+  }
+  if (document.body.clientWidth) {
+    if (document.body.clientWidth<sw_min) sw_min=document.body.clientWidth;
+    if (document.body.clientHeight<sh_min) sh_min=document.body.clientHeight;
+  }
+  if (sw_min==999999 || sh_min==999999) {
+    sw_min=800;
+    sh_min=600;
+  }
+  swide=sw_min-2;
+  shigh=sh_min;
+}
 
-        .gallery-img {
-            height: auto;
-            cursor: zoom-in;
-            filter: drop-shadow(4px 4px 10px rgba(0,0,0,0.3));
-            background: white; 
-            transition: transform 0.2s;
-        }
-
-        /* Fotos de Shorts */
-        .shorts-section .gallery-img {
-            width: 48%; 
-            max-width: 280px;
-        }
-
-        /* Fotos de Tops */
-        .tops-section .gallery-row img {
-            width: 31%; 
-            max-width: 300px;
-        }
-
-        /* Precio y descripción */
-        .price-tag {
-            font-size: 22px;
-            font-weight: bold;
-            font-style: italic;
-        }
-        .shorts-section .price-tag {
-            text-align: right; 
-            margin-right: 50px;
-        }
-        .tops-section .price-tag {
-            text-align: left;
-            margin-top: 15px;
-        }
-
-
-        /* === LIGHTBOX (VISOR) - NO CAMBIA === */
-        .lightbox {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.95);
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .lightbox.active {
-            display: flex;
-            opacity: 1;
-        }
-        .lightbox img {
-            max-width: 95%;
-            max-height: 85vh;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            object-fit: contain;
-        }
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 40px;
-            color: #000;
-            cursor: pointer;
-            z-index: 10001;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="poster-container">
-        
-        <div class="intro-text">
-            Nikiri Catalogo Nov - Dic #2025 - Piezas Unicas<br>
-            Escríbeme por mensaje privado para comprar.<br>
-            Podés pasar a probarte a mi taller en Boedo.<br>
-            Envíos a todo el país... :)<br>
-            Realizo cualquier fantasía a pedido ***
-        </div>
-
-        <div class="shorts-section">
-            <div class="gallery-row">
-                <img src="short_frente.jpg" alt="Short Frente" class="gallery-img" onclick="openLightbox(this)">
-                <img src="short_espalda.jpg" alt="Short Espalda" class="gallery-img" onclick="openLightbox(this)">
-            </div>
-            <div class="price-tag">
-                Shorts Blancos Sublimados. Talle M - $40.000<br>
-                <span style="text-decoration: line-through;">no disponible</span>
-            </div>
-        </div>
-
-        <div class="tops-section">
-            <div class="gallery-row">
-                <img src="top_frente.jpg" alt="Top Frente" class="gallery-img" onclick="openLightbox(this)">
-                <img src="top_espalda.jpg" alt="Top Espalda" class="gallery-img" onclick="openLightbox(this)">
-                <img src="top_modelo.jpg" alt="Top Modelo" class="gallery-img" onclick="openLightbox(this)">
-            </div>
-            <div class="price-tag">
-                Top Morley Rosa Pastel<br>
-                Sublimado, Dibujo Marcador para Tela, Etiquetas They.<br>
-                Talle S - $40.000
-            </div>
-        </div>
-
-    </div>
-
-    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-        <span class="close-btn">&times;</span>
-        <img id="lightbox-img" src="">
-    </div>
-
-    <script>
-        function openLightbox(element) {
-            var lightbox = document.getElementById("lightbox");
-            var lightboxImg = document.getElementById("lightbox-img");
-            lightboxImg.src = element.src;
-            lightbox.classList.add('active');
-        }
-
-        function closeLightbox() {
-            document.getElementById("lightbox").classList.remove('active');
-        }
-    </script>
-
-</body>
-</html>
-
-
-
+function cats_and_dogs(c) {
+  var i, x, o=0;
+  for (i=0; i<drops; i++) {
+    flky[i]+=fldy[i];
+    if (flky[i]>=shigh-16) {
+	  flky[i]=-16;
+	  fldy[i]=2+Math.floor(Math.random()*4);
+	  flkx[i]=2*Math.floor(Math.random()*swide/2);
+	  flks[i].style.left=flkx[i]+"px";
+	}
+	flks[i].style.top=flky[i]+"px";
+  }
+}
+// ]]>
+</script>
