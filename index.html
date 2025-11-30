@@ -14,35 +14,33 @@
             color: #000;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Alineación superior para el scroll vertical */
+            align-items: flex-start;
             min-height: 100vh;
         }
 
         /* === EL LIENZO PRINCIPAL (TU PÓSTER) === */
         .poster-container {
             position: relative; 
-            width: 90%; /* Ocupa el 90% del ancho disponible en cualquier pantalla */
-            max-width: 1000px; /* Límite de ancho en PC */
-            aspect-ratio: 700 / 990; /* Mantiene la proporción vertical del mockup */
+            width: 90%; 
+            max-width: 1000px; 
+            aspect-ratio: 700 / 990; 
             margin: 20px auto; 
-            background-image: url('fondo.png'); /* Fondo de la carpeta */
+            background-image: url('fondo.png'); 
             background-size: 100% 100%; 
             background-repeat: no-repeat;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
             background-color: #fff;
         }
-        
-        /* Eliminamos el @media que forzaba el min-width */
 
         /* === TEXTOS Y BLOQUES (Posicionamiento Absoluto y Proporcional) === */
         
         /* 1. Bloque de Texto Superior */
         .intro-text {
             position: absolute;
-            top: 9%; /* Posición vertical en porcentaje */
-            left: 33%; /* Posición horizontal en porcentaje */
+            top: 9%; 
+            left: 33%; 
             width: 60%;
-            font-size: 2vw; /* Escala con el ancho de la pantalla */
+            font-size: 2vw; 
             font-weight: bold;
             line-height: 1.4;
         }
@@ -90,7 +88,7 @@
 
         /* Precio y descripción */
         .price-tag {
-            font-size: 1.8vw; /* Escala con el ancho de la pantalla */
+            font-size: 1.8vw; 
             font-weight: bold;
             font-style: italic;
         }
@@ -109,10 +107,101 @@
             .price-tag { font-size: 18px; }
         }
 
-        /* === LIGHTBOX (VISOR) - Mismo código, pero adaptado a la nueva estructura === */
+        /* === LIGHTBOX (VISOR) === */
         .lightbox {
             display: none;
             position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+        .lightbox img {
+            max-width: 95%;
+            max-height: 85vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            object-fit: contain;
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: #000;
+            cursor: pointer;
+            z-index: 10001;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="poster-container">
+        
+        <div class="intro-text">
+            Nikiri Catalogo Nov - Dic #2025 - Piezas Unicas<br>
+            Escríbeme por mensaje privado para comprar.<br>
+            Podés pasar a probarte a mi taller en Boedo.<br>
+            Envíos a todo el país... :)<br>
+            Realizo cualquier fantasía a pedido ***
+        </div>
+
+        <div class="shorts-section">
+            <div class="gallery-row">
+                <img src="short_frente.jpg" alt="Short Frente" class="gallery-img" onclick="openLightbox(this)">
+                <img src="short_espalda.jpg" alt="Short Espalda" class="gallery-img" onclick="openLightbox(this)">
+            </div>
+            <div class="price-tag">
+                Shorts Blancos Sublimados. Talle M - $40.000<br>
+                <span style="text-decoration: line-through;">no disponible</span>
+            </div>
+        </div>
+
+        <div class="tops-section">
+            <div class="gallery-row">
+                <img src="top_frente.jpg" alt="Top Frente" class="gallery-img" onclick="openLightbox(this)">
+                <img src="top_espalda.jpg" alt="Top Espalda" class="gallery-img" onclick="openLightbox(this)">
+                <img src="top_modelo.jpg" alt="Top Modelo" class="gallery-img" onclick="openLightbox(this)">
+            </div>
+            <div class="price-tag">
+                Top Morley Rosa Pastel<br>
+                Sublimado, Dibujo Marcador para Tela, Etiquetas They.<br>
+                Talle S - $40.000
+            </div>
+        </div>
+
+    </div>
+
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="close-btn">&times;</span>
+        <img id="lightbox-img" src="">
+    </div>
+
+    <script>
+        function openLightbox(element) {
+            var lightbox = document.getElementById("lightbox");
+            var lightboxImg = document.getElementById("lightbox-img");
+            lightboxImg.src = element.src;
+            lightbox.classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById("lightbox").classList.remove('active');
+        }
+    </script>
+
+</body>
+</html>            position: fixed;
             z-index: 9999;
             left: 0;
             top: 0;
@@ -203,4 +292,5 @@
     </script>
 
 </body>
+
 </html>
