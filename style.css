@@ -1,0 +1,26 @@
+/* 4. Sección Nuevos Tops (Agregada) */
+.new-tops-section {
+    position: absolute;
+    top: 1250px; /* Posicionamiento debajo de la sección de Tops */
+    left: 50px;
+    width: 900px;
+}
+
+/* Reutilizamos los estilos de tops-section para las galerías y precios */
+.new-tops-section .gallery-row img {
+    width: 31%; 
+    max-width: 300px;
+}
+.new-tops-section .price-tag {
+    text-align: left;
+    margin-top: 15px;
+}
+.green-top-section .gallery-row img:nth-child(1) {
+    /* Nueva definición de borde: 5px de grosor, estilo dotted (puntos), color verde */
+    border: 5px dotted #4CAF50; 
+    
+    border-radius: 10px;
+    padding: 5px;
+    background-color: white; 
+    box-sizing: border-box; 
+}
