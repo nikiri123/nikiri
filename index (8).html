@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nikiri akerman</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #111111;
+      --accent-color: #ff1493;
+      --border-color: #111111;
+      --font-main: Arial, Helvetica, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg-color); color: var(--text-color); font-family: var(--font-main); font-size: 13px; line-height: 1.45; }
+    .layout { display: flex; align-items: flex-start; min-height: 100vh; }
+    .sidebar { width: 33.3333%; position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 20px; border-right: 1px dashed var(--border-color); background: var(--bg-color); z-index: 20; }
+  @keyframes flujoArcoiris { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    .site-title { font-size: 14px; font-weight: normal; cursor: pointer; display: inline-block; margin-bottom: 14px; padding: 2px 4px; }
+    .category-item { cursor: pointer; padding: 2px 4px; user-select: none; }
+    .site-title:hover, .category-item:hover { color: var(--accent-color); }
+    .category-item.active {
+      color: #111111;
+      background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+      background-size: 400% 100%;
+      animation: flujoArcoiris 14s linear infinite;
+    }
+    .featured-box { width: 100%; margin-bottom: 16px; }
+    .featured-box img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; border: 1px dashed var(--border-color); background: #f9f9f9; }
+    .category-list { list-style: none; }
+   
+    .main { width: 66.6667%; padding: 20px; position: relative; min-height: 100vh; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px dashed var(--border-color); }
+    .blocks-container { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; position: relative; min-height: 75vh; }
+    .block-item { position: relative; max-width: 100%; }
+    .align-left { flex-basis: 100%; display: flex; justify-content: flex-start; }
+    .align-center { flex-basis: 100%; display: flex; justify-content: center; }
+    .align-right { flex-basis: 100%; display: flex; justify-content: flex-end; }
+    .block-inner { width: 100%; position: relative; }
+    .block-item.align-sticker { position: absolute; z-index: 10; margin: 0; }
+    .text-block-content { padding: 12px; line-height: 1.55; word-break: break-word; }
+    .text-block-content h1 { font-size: 20px; font-weight: bold; margin-bottom: 8px; line-height: 1.25; }
+    .text-block-content h2 { font-size: 15px; font-weight: bold; margin-bottom: 6px; }
+    .text-block-content h3 { font-size: 12px; font-weight: normal; margin-bottom: 6px; letter-spacing: 0.2px; }
+    .text-block-content p { margin-bottom: 8px; }
+    .text-block-content ul, .text-block-content ol { padding-left: 20px; margin-bottom: 8px; }
+    .text-block-content blockquote { border-left: 1px dashed var(--border-color); padding-left: 10px; margin: 8px 0; font-style: italic; }
+    .text-block-content a { color: var(--accent-color); text-decoration: underline; }
+    .spacer-block-inner { width: 100%; display: flex; align-items: center; justify-content: center; }
+    .spacer-line { width: 100%; height: 0; }
+    .image-block-figure img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+    .video-block-wrapper { width: 100%; position: relative; background: #000000; overflow: hidden; }
+    .video-block-wrapper iframe { width: 100%; height: 100%; display: block; border: 0; }
+    .image-caption { font-size: 11px; margin-top: 5px; opacity: 0.85; line-height: 1.35; }
+    .grid-block-masonry { column-gap: 12px; width: 100%; }
+    .grid-sub-item { break-inside: avoid; margin-bottom: 12px; }
+    .grid-sub-item img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+    .lightbox { display: none; position: fixed; inset: 0; background: rgba(255, 255, 255, 0.96); z-index: 100; align-items: center; justify-content: center; flex-direction: column; padding: 24px; user-select: none; }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 82vw; max-height: 82vh; width: auto; height: auto; border: 1px dashed var(--border-color); }
+    .lightbox-caption { margin-top: 10px; font-size: 12px; max-width: 80vw; text-align: center; }
+    .lightbox-counter { position: fixed; top: 16px; left: 20px; background: var(--bg-color); border: 1px dashed var(--border-color); padding: 4px 8px; font-size: 12px; display: none; }
+    .lightbox-close { position: fixed; top: 16px; right: 20px; background: var(--bg-color); border: 1px dashed var(--border-color); padding: 4px 8px; cursor: pointer; font-size: 12px; }
+    .lightbox-nav { position: fixed; top: 50%; transform: translateY(-50%); background: var(--bg-color); border: 1px dashed var(--border-color); padding: 8px 12px; cursor: pointer; font-size: 14px; color: var(--text-color); z-index: 102; display: none; }
+    .lightbox-prev { left: 16px; }
+    .lightbox-next { right: 16px; }
+    .lightbox-close:hover, .lightbox-nav:hover { color: var(--accent-color); border-color: var(--accent-color); }
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; position: static; height: auto; border-right: none; border-bottom: 1px dashed var(--border-color); }
+      .main { width: 100%; }
+      .blocks-container { gap: 10px; }
+      .block-item.mobile-hidden { display: none !important; }
+      .block-item.align-sticker { position: relative !important; left: auto !important; top: auto !important; flex-basis: 100%; display: flex; justify-content: center; width: 100% !important; }
+      .block-item.align-sticker .block-inner { width: var(--mob-w, 100%) !important; }
+      .block-item.align-flow { width: var(--mob-flow-w, 100%) !important; }
+      .block-item:not(.align-flow):not(.align-sticker) .block-inner { width: var(--mob-w, 100%) !important; }
+      .grid-block-masonry { column-count: var(--mob-cols, 2) !important; }
+      .lightbox img { max-width: 92vw; max-height: 75vh; }
+      .lightbox-nav { top: auto; bottom: 20px; transform: none; padding: 6px 14px; }
+      .lightbox-prev { left: 25%; }
+      .lightbox-next { right: 25%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="site-title active" id="homeBtn">nikiri akerman</div>
+      <div class="featured-box"><img id="featuredImg" src="" alt="Vista previa"></div>
+      <ul class="category-list" id="categoryList"></ul>
+    </aside>
+    <main class="main">
+      <div class="toolbar"><span id="currentViewLabel">inicio</span></div>
+      <div class="blocks-container" id="blocksContainer"></div>
+    </main>
+  </div>
+  <div class="lightbox" id="lightbox">
+    <span class="lightbox-counter" id="lightboxCounter"></span>
+    <button class="lightbox-close" id="lightboxClose">cerrar [esc]</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev">←</button>
+    <img id="lightboxImg" src="" alt="">
+    <button class="lightbox-nav lightbox-next" id="lightboxNext">→</button>
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+  <script>
+    const DATA = {"theme":{"bg":"#ffffff","text":"#111111","accent":"#ff1493","border":"#111111","font":"Arial, Helvetica, sans-serif"},"home":{"name":"inicio","featuredImg":"https://lh3.googleusercontent.com/d/19tRUdMH4rIgoPSqcTEWF5arrWYZpVMWs","blocks":[{"id":"b-p9ylvug","type":"image","width":49,"mobileWidth":100,"align":"flow","borderStyle":"none","borderWidth":1,"borderColor":"#111111","x":452,"y":9,"src":"https://lh3.googleusercontent.com/d/1DUolTa_K-IZuyAl2mrqctOFO-AtTkAbt","caption":""},{"id":"b-h13u430","type":"image","width":48,"mobileWidth":100,"align":"flow","borderStyle":"none","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/19tRUdMH4rIgoPSqcTEWF5arrWYZpVMWs","caption":""}]},"categories":[{"id":"101-lamparas","name":"101 Lamparas. / Las Deudas","featuredImg":"https://lh3.googleusercontent.com/d/1MEtbU_kiqNz8TFmG57ZZ-2O5nVp6bOgM","blocks":[{"id":"b-101-2","type":"image","width":66,"mobileWidth":100,"align":"center","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","x":50,"y":120,"src":"https://lh3.googleusercontent.com/d/1H2hZfbIE9A0zDuy0Ho2esrp8s8uCn8zO","caption":""},{"id":"b-mrykdj3","type":"grid","width":100,"mobileWidth":100,"align":"flow","cols":2,"mobileCols":2,"borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/1MEtbU_kiqNz8TFmG57ZZ-2O5nVp6bOgM","https://lh3.googleusercontent.com/d/1bK_oOwNceeJPt3mIwr_6vWq_GyVCCpuo","https://lh3.googleusercontent.com/d/1CT06CJyQoTCg42aCj8B-Fhl7u4D9gKSA","https://lh3.googleusercontent.com/d/1oUvtFzFnBgklaaQWbm012SQFeyMRH9Vh","https://lh3.googleusercontent.com/d/16EOvvlG4kWveCck-nOeXoeRmmeH3mkP2","https://lh3.googleusercontent.com/d/1xixuPZJ5kcB8ZBCMMqJ3sid65Em875v8","https://lh3.googleusercontent.com/d/1H2hZfbIE9A0zDuy0Ho2esrp8s8uCn8zO","https://lh3.googleusercontent.com/d/1lgu8NfuRhLWsQvofcy4SudCANu3OyAzn","https://lh3.googleusercontent.com/d/1euzusbDjD1yxV67Ye-xoY5gAfmZBP2_Z","https://lh3.googleusercontent.com/d/1xSFxj7wh6Bwd_13YYT59BwCuz2u7rD0o","https://lh3.googleusercontent.com/d/1pPAM0nHfYBOvp-fcramwRnhn3qY6SiUX","https://lh3.googleusercontent.com/d/1Qob9EcRklsrSzjq5LETivBYeHyyAkGFu","https://lh3.googleusercontent.com/d/1RfvNRLTyPPfK5bRXSQuRASJkwgHhBocd","https://lh3.googleusercontent.com/d/1_aMsnerrzOkDNjeytulFsLTEMZPFulDf","https://lh3.googleusercontent.com/d/187Q6y8C7IoAeMCzkJqOODD7cn8Y8IM37","https://lh3.googleusercontent.com/d/1adm4Ka_qZztSpKGSFzRSL4EAUnI4mRsh","https://lh3.googleusercontent.com/d/1P46TR2IgZIDzWqAZ2sTDE94mHRDIrgix","https://lh3.googleusercontent.com/d/1y-aNFHzKLBJrDvy4eAEfeqMi2Iakpbe2","https://lh3.googleusercontent.com/d/1ZJ-C5c0RiEylGUpnsTszSLzW5l3vAeIV","https://lh3.googleusercontent.com/d/13McHooadOv2ID7SUDNWj-cxe1owfZr4D","https://lh3.googleusercontent.com/d/1xxzZNmpYwSxXrDpn46yOwGvF1-sQhEqU","https://lh3.googleusercontent.com/d/1ROXXsTfneEH0J4BROqy8gAY2Gh86wqc2"]}]},{"id":"fruta-madura","name":"Fruta Madura Nueva Fortuna. / La Plateada","featuredImg":"","blocks":[{"id":"b-7uexkry","type":"grid","width":100,"mobileWidth":100,"align":"flow","cols":2,"mobileCols":2,"borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/17Ok4IMsQn5QIDPeSrSfdcHfRyJ-qrZih","https://lh3.googleusercontent.com/d/1N4zkC6Udc_WzyOEZ7UbQZS2oxj3qnl1u","https://lh3.googleusercontent.com/d/1WY2AlshZugY6tgXJXiMq-HN5N4cWULm9"]}]},{"id":"fantasia-femboy","name":"Fantasia Femboy.","featuredImg":"","blocks":[{"id":"b-4xa169h","type":"grid","width":100,"mobileWidth":100,"align":"flow","cols":3,"mobileCols":2,"borderStyle":"none","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/1s6IwEf4UDtLm6XaXiydl2oBFmukmpmqZ","https://lh3.googleusercontent.com/d/1rbh-EU-p-WqGB630JeFANnqa3Emnikf1","https://lh3.googleusercontent.com/d/1g6YxuvdeuY7WHShqPxemBo138LVxA9bK","https://lh3.googleusercontent.com/d/1BAocd0lGetONq0fKRV-ps2Xmm-m3KDia","https://lh3.googleusercontent.com/d/19B_e6y2xc8R8mZ1rNsDlLB04C5uh5Wcf","https://lh3.googleusercontent.com/d/1HLeMdPUvOlfeKQJxqu_FC2DjsX7Ahd47","https://lh3.googleusercontent.com/d/1rcYwSaMefKBsQRiODjV5-D8x-aZql1_l","https://lh3.googleusercontent.com/d/11VagDp3tZkeUEbU9T13wNNiyoy5xaTKO"]}]},{"id":"accesorios-princesa","name":"Accesorios de Princesa.","featuredImg":"https://lh3.googleusercontent.com/d/1hoj7L-J57TejIdwW2skK5DCgCdFf9j4P","blocks":[{"id":"b-8oagg8k","type":"image","width":48,"mobileWidth":100,"align":"center","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1hoj7L-J57TejIdwW2skK5DCgCdFf9j4P","caption":""},{"id":"b-w7hfk48","type":"image","width":48,"mobileWidth":100,"align":"center","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1xkiBuOCOadW0Ofev7Iu-vlg24bct_wsf","caption":""},{"id":"b-zchy01y","type":"image","width":32,"mobileWidth":100,"align":"center","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1Z16xJSIvkK4lHZK0qwUyFrIGl1QAqpCN","caption":""},{"id":"b-boir719","type":"image","width":48,"mobileWidth":100,"align":"flow","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1SJfW_JH_bx-6DargtefxTfElxqhuY2_e","caption":""},{"id":"b-jftrzo9","type":"image","width":32,"mobileWidth":100,"align":"flow","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/186B1WjwBY5iBbbt8BjZsjINDbBKbyjBD","caption":""}]},{"id":"carton-tenedores","name":"Carton y Tenedores.","featuredImg":"https://lh3.googleusercontent.com/d/1mP0knZ_RgnB0yTfKA4E75YDKXGHnEBu6","blocks":[{"id":"b-zm3a4wi","type":"image","width":48,"mobileWidth":100,"align":"center","borderStyle":"none","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1mP0knZ_RgnB0yTfKA4E75YDKXGHnEBu6","caption":""},{"id":"b-wgepicp","type":"grid","width":100,"mobileWidth":100,"align":"center","cols":4,"mobileCols":1,"borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/1cgJz7pYsFJ7d-TCy4mfspz1jeOvuuT4G","https://lh3.googleusercontent.com/d/19fkcLBqQ-61HzJGq-r8EBFhU_rJEKPNk","https://lh3.googleusercontent.com/d/1-yba94n8lWG3DUVFKm2haJ8sz6RNt4pO","https://lh3.googleusercontent.com/d/1wZIu2nwss2mPoahOTD6JfoDZsCfH5zMW"]}]},{"id":"bonito-dia","name":"Que tengas un hermoso dia.. / Sculptor Korea","featuredImg":"https://lh3.googleusercontent.com/d/1biLWpywMc0w7kCN4nnknyGVInBS1JQh_","blocks":[{"id":"b-nwx1onh","type":"text","width":100,"mobileWidth":100,"align":"flow","borderStyle":"none","borderWidth":1,"borderColor":"#111111","html":"<h1>Que tengas un hermoso dia..&nbsp;</h1><blockquote>Virtual, 2025</blockquote><div>colaboracion con marca de indumentaria koreana. <a href=\"sculptorworldwide.com\">sculptorworldwide.com</a></div><div><br></div><div>selfies hogarenas, vistiendome con materiales que tengo cerca.</div>"},{"id":"b-xn8o7bk","type":"image","width":66,"mobileWidth":80,"align":"center","borderStyle":"none","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1biLWpywMc0w7kCN4nnknyGVInBS1JQh_","caption":""},{"id":"b-diwgvk1","type":"image","width":48,"mobileWidth":89,"align":"flow","borderStyle":"none","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1RSL96UMue1qV9kw2m5Iiis-cuRMWvZLp","caption":""},{"id":"b-y6l206k","type":"image","width":48,"mobileWidth":74,"align":"center","borderStyle":"none","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1m7qYS8AbbgllB9ONRiZU_4g8SH96g45a","caption":""},{"id":"b-gx5h1q0","type":"grid","width":100,"mobileWidth":100,"align":"center","cols":3,"mobileCols":2,"borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/1XKVnoydgRirG01xuyAwcWuMGFvO7Kk2g","https://lh3.googleusercontent.com/d/1UBbjKF7iYcqskjFPWsMRzP9BpzpjhM6d","https://lh3.googleusercontent.com/d/1opOAw_-gsiXf0UqiO0YTbtapOAZA5ff5","https://lh3.googleusercontent.com/d/1r2bwaI6-66ejkxNWfZdmQQrljuw3CPVR","https://lh3.googleusercontent.com/d/1AIJ6Aq3fEG4MLUxHTpN9FDZXWnl3jwx3","https://lh3.googleusercontent.com/d/1hvj8avwjDGofi6v9zozx7tuvXYzLrFX0","https://lh3.googleusercontent.com/d/13ltzHjO-MNWwSbc_skW8oWqfTkcDtEJ9","https://lh3.googleusercontent.com/d/1ViDlRXwTGEuaHVvg3tZ3CFT6ii4B5xUT","https://lh3.googleusercontent.com/d/1tiJ8ElwdCIKKYWq6_B0xr3zphKekvJtd","https://lh3.googleusercontent.com/d/1B-_HBRlm0aKA_M4unsv38VZaFMSckmyk","https://lh3.googleusercontent.com/d/1_LsKpf1Mm23PGb0SxEDkR-Jt2Oxfrbtl"]},{"id":"b-j6l4rg2","type":"spacer","width":100,"mobileWidth":100,"align":"flow","height":30,"borderStyle":"dotted","borderWidth":3,"borderColor":"#00ff55","hideMobile":false}]},{"id":"chicas-camiones","name":"Chicas, Camiones y Moñitos. / Para Vos Norma Mia","featuredImg":"https://lh3.googleusercontent.com/d/11WUvdBGPnngZvmJpe5UXhC9xnTFT0q-Z","blocks":[{"id":"b-0iwkb6d","type":"grid","width":100,"mobileWidth":100,"align":"flow","cols":2,"mobileCols":2,"borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/116VwSVKMaRwlkJGM2NyyCZoV0LMgs4jt","https://lh3.googleusercontent.com/d/111IH_tYrZk2OFJYe0FND6c7Q_B-c4YOD","https://lh3.googleusercontent.com/d/118jQEQfLZzLXK3APdoESMkvwwhOuLEKs","https://lh3.googleusercontent.com/d/119wfVa96wjbrzxo0IWrL11Bp4joa5tAS","https://lh3.googleusercontent.com/d/11AzbtqMFu3g8mYV7zFi2FMNd9eFLEecb","https://lh3.googleusercontent.com/d/11CTsJOmVkABkt3SGPaMI_At3Ol5K7QWO","https://lh3.googleusercontent.com/d/11JMGueElmNsDOWJvXt26Snu6OOXSOlQd","https://lh3.googleusercontent.com/d/11VKiLVTvvaK01XJzvCSmsqe4jpRFXzD8","https://lh3.googleusercontent.com/d/11WUvdBGPnngZvmJpe5UXhC9xnTFT0q-Z","https://lh3.googleusercontent.com/d/11_TzvLgoerZ6wSuERXxRzUNc7ZDDZi_X","https://lh3.googleusercontent.com/d/11_hTjBE8c1lE-KtJQK1-epvy-hpckn4V"]},{"id":"b-ht7914p","type":"grid","width":100,"mobileWidth":100,"align":"center","cols":2,"mobileCols":2,"borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/13YNxZ196Z2K_GKEzjlG3woMuT6s_9PrS","https://lh3.googleusercontent.com/d/12qkuF3MntJphxxvmXXEQCWlRthtpS3X4","https://lh3.googleusercontent.com/d/13cF7uEdp-A6hP8vDxl3T-1PMPOg-WQe2","https://lh3.googleusercontent.com/d/145kxpEeyJfaU4hQNujJZPP3ILKFTlsYH","https://lh3.googleusercontent.com/d/14vS3Kzf7JcseLn4TXQcql9oOrhGftCNa","https://lh3.googleusercontent.com/d/15F8U-HhrEPxnqTY8qxgdy5YFzwXdx9J7","https://lh3.googleusercontent.com/d/15FknBZlRLFfX8YNwZFUFj79rXUU5fbCF","https://lh3.googleusercontent.com/d/15Wchhzld344hDBjUGZxIIgT2TPeOCHXS","https://lh3.googleusercontent.com/d/12elB8P_Kiw_8l3me5tin34-3AseccYPS"]}]},{"id":"hebillitas-nikiri","name":"Hebillitas Nikiri. / Galeria el Provador","featuredImg":"https://lh3.googleusercontent.com/d/1ZucPTAtOswVajjyMQhXnOwv-gnKZvffw","blocks":[{"id":"b-99fx9z4","type":"grid","width":100,"mobileWidth":100,"align":"flow","cols":4,"mobileCols":2,"borderStyle":"none","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/1Ekdn6dbc773g6LEDdGLdKgKDvwQU2lXD"]},{"id":"b-i1mnzn0","type":"text","width":100,"mobileWidth":100,"align":"flow","borderStyle":"none","borderWidth":1,"borderColor":"#111111","html":"<blockquote>texto de sala x Vale Lopez Muñoz</blockquote><div>Las amigas se juntarán alrededor de ti&nbsp;</div><div>Como rodeando</div><div>Una hebilla para el pelo</div><div>(I ching)</div><div><br></div><div>Algunas veces hacemos cosas para sentirnos mejor. Una vez mi mamá necesitó cambiar de trabajo y se le ocurrió poner un negocio en el living de nuestra casa. Mi hermana y yo le suplicamos que porfi sea un negocio de accesorios de moda, porque en nuestro pueblo no había y hacía mucha falta. Así fue que a los pocos meses parte de nuestra casa se convirtió en un paraíso de aritos, collares, carteras, anillos, cinturones, pines y, por supuesto, hebillitas. Me acuerdo perfecto de las dos primeras cajas que llegaron por encomienda desde Buenos Aires con cartelitos de las marcas Paw y Carey. Paw es o era una marca cuyo logo era una huellita de perro color negra y Carey tiene o tenía la particularidad de que todos sus productos eran de los colores del dulce de batata con chocolate, tipo marmolado. En esa época yo salía del colegio a las 12 del mediodía y entraba directo a trabajar al negocio. Aunque a esa hora estaba cerrado, me traía a todas las amigas del cole y las atendía a puertas cerradas. Por lo general ellas no tenían plata entonces compraban anotado y después sus xadres venían a pagar la deuda a fin de mes, si es que se acordaban.</div><div>Después mi abuela también necesitó un trabajo, entonces al negocio de accesorios -que no tenía nombre- se le adosó una mercería. Mi abuela era la modista del pueblo y muchas veces le costaba conseguir elementos como cierres, ganchitos, hilos, agujas, cintas, broderie, botones o alfileres para confeccionar sus creaciones. Entonces se armó una merecería para ella misma, pero también la compartía con otras clientas. Al principio los dos rubros, accesorios y mercería, estaban bien separados. Cada cosa tenía su vitrina exhibidora, su calculadora y su anotador. Pero con los movimientos del día a día, que es el tiempo y las emociones de todxs, muchas cosas se fueron corriendo de sus lugares y encontrando otras disposiciones y fusiones, como haciendo mini orgías: collar con lana, alfiler con arito con cinta, botón con pin. Este momento, este hallazgo en el estante de la memoria, se parece mucho a como son las hebillitas de Nikiri.&nbsp;</div><div>En El Probador y en el mundo las hebillas se diseminan como el laurel, son seres no tan sutiles que cumplen con su existencia.&nbsp;</div><div>¿Todo puede ser una hebilla?&nbsp;</div><div>Una estrella porno puede ser una hebilla</div><div><br></div><div>¿Una hebilla puede tener unx hijitx hebilla?</div><div>Sí, un lindo nombre para una hebilla bb es Andrea</div><div><br></div><div>¿Qué las hace lindas?</div><div>La luz, el aire, el brillo, la atmósfera, el mechoncito de pelo las hace lindas</div><div><br></div><div>¿Torpes o ingeniosas?</div><div>¿Se puede las 2?</div><div><br></div><div>¿Una certeza?</div><div>Hebilla se parece a semilla</div><div><br></div><div>¿Sostienen y exhiben al mismo tiempo?</div><div>Están más acá y más allá de lo útil pero nunca pierden del todo su condición de usables</div><div><br></div><div>¿Las hebillas son pedacitos de utopías?</div><div><br></div><div>Pedacitos de utopías inadvertidas que habitan nuestra cabeza, nuestro zapato, nuestra croc</div><div><br></div><div><br></div><div><br></div><div>୨୧(̷ ̷〇̷ ̷﹏̷ ̷〇̷ ̷)̷୨୧</div><div><br></div>"},{"id":"b-h4ag0q6","type":"grid","width":100,"mobileWidth":100,"align":"flow","cols":4,"mobileCols":2,"borderStyle":"none","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/1kLaIx5a_2JVHCPVAw7GkZojaBilH5nw6","https://lh3.googleusercontent.com/d/1-pUbKa4iY-0VHeFJ71RPu5vBUD5K7F4L","https://lh3.googleusercontent.com/d/1fqbdJxhV9t6ZOf_gQqavlmsxnLZ-GWvf","https://lh3.googleusercontent.com/d/1ZucPTAtOswVajjyMQhXnOwv-gnKZvffw","https://lh3.googleusercontent.com/d/1T_ODXKg3cLKHaWshnp29Qi30LMDW-M14","https://lh3.googleusercontent.com/d/1VSrqKxc265oCFu-dCkUxteCvgG_cWL4P","https://lh3.googleusercontent.com/d/1Ekdn6dbc773g6LEDdGLdKgKDvwQU2lXD","https://lh3.googleusercontent.com/d/1MPC49xzn-hcPpq2z8quzKfbkb-pwOegQ"]}]},{"id":"ageneradas","name":"A.G.E.N.E.R.A.D.A.S.","featuredImg":"","blocks":[{"id":"b-0e502t4","type":"text","width":100,"mobileWidth":100,"align":"flow","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","html":"<h2>Perfectos Dragones</h2><p>Escribí acá el texto...</p>"},{"id":"b-o42vinx","type":"grid","width":100,"mobileWidth":100,"align":"flow","cols":3,"mobileCols":2,"borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/1NUn0KvpcXF7nqBc8Yh31jTAYr6elQ1zo","https://lh3.googleusercontent.com/d/1m0ThR4lTMBtTZbNCJcHIXquHGniVQzBs","https://lh3.googleusercontent.com/d/1C9GR3QIYxyr7zcBCKrFKl-ZDxyraW0UW","https://lh3.googleusercontent.com/d/1gxKZqHVX-UR1c5_AQSHhDU2ffbajuYU_","https://lh3.googleusercontent.com/d/170oGSL5UUX8BScqBJUsnBY0xrfn0lE6J","https://lh3.googleusercontent.com/d/1AzlGpVBp9GkN7OkkB-z57KqaN3XABhwV"]},{"id":"b-qffqkcf","type":"text","width":100,"mobileWidth":100,"align":"flow","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","html":"<h2>MOTIVOS?</h2><p>Escribí acá el texto...</p>"},{"id":"b-xcekvh7","type":"text","width":100,"mobileWidth":100,"align":"flow","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","html":"<h2>El limite entre el arte y la moda</h2><p>Escribí acá el texto...</p>"},{"id":"b-1fwcvtw","type":"image","width":48,"mobileWidth":100,"align":"flow","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1ZTVHSKIfMG-R3hrIc3w5KhavvTy-YAlO","caption":""}]},{"id":"cli-cla-pium-miau","name":"CLI-CLA-PIUM-MIAU. / Gatita Gil","featuredImg":"https://lh3.googleusercontent.com/d/1jYV_Dh8OohedfiyoimIN6dWc3bAXT4AF","blocks":[{"id":"b-agobiln","type":"text","width":100,"mobileWidth":100,"align":"flow","borderStyle":"none","borderWidth":1,"borderColor":"#111111","html":"<h2>Cli-Cla-Pium-Miau</h2><blockquote>Munar, Arg.2024</blockquote><p>Muestra de la Kitten Hell. en el marco del Festival de Arte Queer 2024</p>"},{"id":"b-34gyz4g","type":"grid","width":100,"mobileWidth":100,"align":"flow","cols":3,"mobileCols":2,"borderStyle":"double","borderWidth":3,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/1jYV_Dh8OohedfiyoimIN6dWc3bAXT4AF","https://lh3.googleusercontent.com/d/1lcy2cwFzsAvrGwnOlCQdieccaouO9eB3","https://lh3.googleusercontent.com/d/1Bze2IzzuSU46B6fGUdaadOemoMwQC4sd","https://lh3.googleusercontent.com/d/1iP4IGKBhrmQB40waAaQgsQiUPcU86snN","https://lh3.googleusercontent.com/d/1uG4p_-rwd-fOGxj6nPmcPnHO4CltoPec","https://lh3.googleusercontent.com/d/1ka79paf7nvQeuj-ufU0BrbScCoWnZSsB","https://lh3.googleusercontent.com/d/15PAspSQH_lmXDvolbu0Z37slxFtIoAx2","https://lh3.googleusercontent.com/d/1Xvox5RaoR4KIbBNL8kfs_4QTgvxX4Jke"]}]},{"id":"taller-bijouteria","name":"Taller Bijouteria. / Museo Malba","featuredImg":"https://lh3.googleusercontent.com/d/1gpWJyAgw_bBIOLyEbfV1l0NFJjjdDtBX","blocks":[{"id":"b-malba-1","type":"text","width":100,"mobileWidth":100,"align":"flow","borderStyle":"none","borderWidth":1,"borderColor":"#111111","html":"<h1>ଘ(˵╹-╹)━☆⋆ ˚｡⋆୨୧˚ taller bijoujería ˚୨୧⋆｡˚ ⋆ Museo MALBA.</h1><blockquote>Museo Malba, Arg, 2025.</blockquote><p>A cargo de Malicia Mirai y Nikiri Akerman&nbsp;</p><p>A partir de las imágenes generadas por la muestra <i>El desentierro del diablo</i> de Carrie Bencardino proponemos reflexionar sobre el mal a través de la creación de un talismán. Históricamente los hechizos han servido para repeler o atraer nuestras pasiones profundas, asimismo, ven sus facultades amplificadas dentro de un objeto o talismán. Para crear uno hemos dividido el taller en dos instancias, una primera parte imaginativa y textual, y una segunda manual y material que permitirá crear una pieza bijouterie para el cuello, llavero o cualquier otra parte del cuerpo. ¿Podremos protegernos del mal o lo usaremos a nuestro favor?</p><p>La actividad se dividió en dos instancias: una primera parte imaginativa y textual y una segunda manual y material que invitaba a crear una pieza bijouterie para el cuello, llavero o cualquier otra parte del cuerpo.</p><p><a href=\"https://malba.org.ar/evento/%E0%AC%98%CB%B5%E2%95%B9-%E2%95%B9%E2%94%81%E2%98%86%E2%8B%86-%CB%9A%EF%BD%A1%E2%8B%86%E0%AD%A8%E0%AD%A7%CB%9A-taller-bijoujeria-%CB%9A%E0%AD%A8%E0%AD%A7%E2%8B%86%EF%BD%A1%CB%9A-%E2%8B%86/\">malba.org.ar/bijoujeria</a></p>"},{"id":"b-malba-2","type":"image","width":34,"mobileWidth":100,"align":"center","borderStyle":"none","borderWidth":1,"borderColor":"#111111","x":289,"y":62,"src":"https://lh3.googleusercontent.com/d/1MYjnvjJCSzeS_5ytvqV1Ldgy2NUKMkN3","caption":""},{"id":"b-malba-grid","type":"grid","width":100,"mobileWidth":100,"align":"flow","cols":3,"mobileCols":2,"borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/1bAmFZcyiZlLUgJMmw9QISwviNGzgEEp0","https://lh3.googleusercontent.com/d/1ewmcIqnUG7gJx_GiJpyHg3K6VWxHVytQ","https://lh3.googleusercontent.com/d/10E5nrmbs09PVQvPm4JHNGG0wDvvc2Pb5","https://lh3.googleusercontent.com/d/1M6rdQ01YFs-BJTgCAgn81oCJi3NtVgwC","https://lh3.googleusercontent.com/d/1t3QFxOpKzTRQKUOpHNuQQFbUqgwn-xxh","https://lh3.googleusercontent.com/d/1c0j7l7rlbTmVrruc9JbnKLEwCBXdf6F4","https://lh3.googleusercontent.com/d/15gQDadLRLN8quEqHVc0apkOk1f5JSB53","https://lh3.googleusercontent.com/d/1SkRSiD-Yh2HuXMg2hNtJ6abxS_HEM3xc","https://lh3.googleusercontent.com/d/10lI_UNnMazxBYhWgRlj-aNj8mf8y9wXn","https://lh3.googleusercontent.com/d/1OAzP-AG3mBo_sc1KagqE-Z1EcL_VEx6Q","https://lh3.googleusercontent.com/d/1T2aXWIaQqHyWwkqtfbUgy76q3wmtGCYs","https://lh3.googleusercontent.com/d/1bAC43PxKf0A4xOHwKOTlH9HxEPQUJdxc","https://lh3.googleusercontent.com/d/1DUjJkh4TCg5qpxF_T8nv-73QszE7WFVw","https://lh3.googleusercontent.com/d/1MU4PMIPQz3rxg3vGw5btHTUFGNxPGSwQ","https://lh3.googleusercontent.com/d/1JEDITs7K9RnoK0PdoF6DYnRetX4lv4AP","https://lh3.googleusercontent.com/d/1RqUcpFeZLQU606Ju3pGap-xW5-LGb4XV","https://lh3.googleusercontent.com/d/1yjxLG-kMdpeftxYSwnd3fnn98c8RPC4q","https://lh3.googleusercontent.com/d/1pPjI-nvoEUUidakX6mRs3UurcKngSXBQ","https://lh3.googleusercontent.com/d/1KbR98isYvRZW_FpxtGF_Gecyso9Mz2b9","https://lh3.googleusercontent.com/d/1gpWJyAgw_bBIOLyEbfV1l0NFJjjdDtBX"]}]},{"id":"torre-mas-alta","name":"En La Torre Mas Alta. / Primor","featuredImg":"","blocks":[{"id":"b-aqnwnlj","type":"text","width":100,"mobileWidth":100,"align":"flow","borderStyle":"none","borderWidth":1,"borderColor":"#111111","html":"<h1>en la torre mas alta</h1><blockquote><span style=\"font-style: italic; font-size: 13px;\">Primor, Arg.2024</span></blockquote><p>Primer muestra individual. Curaduria Julien. En Primor Es Pop</p>"},{"id":"b-21f0lc7","type":"image","width":66,"mobileWidth":100,"align":"center","borderStyle":"double","borderWidth":1,"borderColor":"#ff00a2","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1mJvsMuugXOsbuL4QuLj_fh93PQslT9sw","caption":""},{"id":"b-hbsvknf","type":"text","width":100,"mobileWidth":100,"align":"flow","borderStyle":"none","borderWidth":1,"borderColor":"#111111","html":"<i>texto curatorial x julien &lt;3<br></i><div><br></div><div>nikiri es una princesa preciosa</div><div>en la torre más alta se encuentra</div><div>para hacer esta bella muestra</div><div>baila, pinta, dibuja y posa&nbsp;</div><div><br></div><div>ella a ningún príncipe espera</div><div>acaso creías que estaba sola?</div><div>sus obras se transforman con un hola</div><div>son sus mejores amigas, re fiesteras</div><div><br></div><div>mirá arriba y abajo, tené cuidado</div><div>son pequeñas, frágiles y curiosas</div><div>se esconden en cualquier lado</div><div><br></div><div>dale animate son amistosas</div><div>sobre este piso plateado</div><div>ellas y vos se ven hermosas</div><div><br></div><div><br></div>"},{"id":"b-2vj2qel","type":"grid","width":100,"mobileWidth":100,"align":"flow","cols":4,"mobileCols":2,"borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","images":["https://lh3.googleusercontent.com/d/1tQgJ39YCWHswS9k3vhaYARD2Csc7cuwv","https://lh3.googleusercontent.com/d/1L5Qlpu1gl_fN2obdZ6Dtvrxvl5vACxJp","https://lh3.googleusercontent.com/d/1qLGDWK5HTXhVJpfDWC_oatzX3D5pFDX_","https://lh3.googleusercontent.com/d/1uifYfTcYUVXpJBjMgYyv6niyRUJ7syd0","https://lh3.googleusercontent.com/d/15oez6uXrN-dVe2HZ28k45UimtnDEa2Z4","https://lh3.googleusercontent.com/d/1JGlAWg9LEr0B_6fghxJ67P5Sdf9voj4m","https://lh3.googleusercontent.com/d/1457mqIO8lb4qyh7cJD4uXs6rDKv9Ypkl","https://lh3.googleusercontent.com/d/1kDMrDRveCQNTCKSW4cAZPEyNH4DAeQ0G","https://lh3.googleusercontent.com/d/1kqIBpRwnSLO78JcMxBb58QnFAIfV9ifx","https://lh3.googleusercontent.com/d/1HxetawLAWFCyYOEsw_kPGxS3Wk0V6deE","https://lh3.googleusercontent.com/d/1iotRYa7cQkWelsgRVhh-u9bk5a7qLavA","https://lh3.googleusercontent.com/d/1q_tMXnXph_83L9finsM8V-SPyKoXLAhh","https://lh3.googleusercontent.com/d/14dJfWtjh_tTSahD82LgUDc1irngACWmZ","https://lh3.googleusercontent.com/d/1IhKdn4YtHzGXdD1LLCKCu2tj6Nn8vqNC","https://lh3.googleusercontent.com/d/1GaA8RVy6BPrO4u6Aokv1Myd2smMSOOaR","https://lh3.googleusercontent.com/d/1aDDgDWBx2nhFCSOi1-yoO9XsxzoxDtbB"]},{"id":"b-bljlhm3","type":"image","width":100,"mobileWidth":100,"align":"flow","borderStyle":"dashed","borderWidth":1,"borderColor":"#111111","x":50,"y":50,"src":"https://lh3.googleusercontent.com/d/1libw5UZTlMCcDHqpPgJBA4Wv3nN5GeTf","caption":""}]}]};
+    let activeSectionId = "home";
+    let lbGallery = [];
+    let lbIndex = 0;
+    let touchStartX = 0;
+
+    const categoryListEl = document.getElementById("categoryList");
+    const blocksContainerEl = document.getElementById("blocksContainer");
+    const featuredImgEl = document.getElementById("featuredImg");
+    const currentViewLabelEl = document.getElementById("currentViewLabel");
+    const homeBtn = document.getElementById("homeBtn");
+    const lightboxEl = document.getElementById("lightbox");
+    const lightboxImgEl = document.getElementById("lightboxImg");
+    const lightboxCaptionEl = document.getElementById("lightboxCaption");
+    const lightboxCounterEl = document.getElementById("lightboxCounter");
+    const lightboxPrevEl = document.getElementById("lightboxPrev");
+    const lightboxNextEl = document.getElementById("lightboxNext");
+
+    function getFallbackDriveUrl(url) {
+      const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      return m ? "https://drive.google.com/thumbnail?id=" + m[1] + "&sz=w1600" : url;
+    }
+    function openLb(imgs, idx, cap) {
+      lbGallery = imgs;
+      lbIndex = idx;
+      updateLb(cap);
+      lightboxEl.classList.add("open");
+    }
+    function updateLb(cap) {
+      const src = lbGallery[lbIndex];
+      lightboxImgEl.onerror = function() { this.onerror = null; this.src = getFallbackDriveUrl(src); };
+      lightboxImgEl.src = src;
+      lightboxCaptionEl.textContent = cap || "";
+      if (lbGallery.length > 1) {
+        lightboxPrevEl.style.display = "block";
+        lightboxNextEl.style.display = "block";
+        lightboxCounterEl.style.display = "block";
+        lightboxCounterEl.textContent = (lbIndex + 1) + " / " + lbGallery.length;
+      } else {
+        lightboxPrevEl.style.display = "none";
+        lightboxNextEl.style.display = "none";
+        lightboxCounterEl.style.display = "none";
+      }
+    }
+    function stepLb(d) {
+      if (lbGallery.length <= 1) return;
+      lbIndex = (lbIndex + d + lbGallery.length) % lbGallery.length;
+      updateLb("");
+    }
+    lightboxPrevEl.addEventListener("click", e => { e.stopPropagation(); stepLb(-1); });
+    lightboxNextEl.addEventListener("click", e => { e.stopPropagation(); stepLb(1); });
+    lightboxEl.addEventListener("touchstart", e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    lightboxEl.addEventListener("touchend", e => {
+      const diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 40) stepLb(diff > 0 ? 1 : -1);
+    }, { passive: true });
+
+    function getSectionPreviewImage(sec) {
+      if (sec.featuredImg) return sec.featuredImg;
+      const imgB = sec.blocks.find(b => b.type === "image" && b.src);
+      if (imgB) return imgB.src;
+      const gridB = sec.blocks.find(b => b.type === "grid" && b.images && b.images.length);
+      if (gridB) return gridB.images[0];
+      const vidB = sec.blocks.find(b => b.type === "youtube" && b.videoId);
+      if (vidB) return "https://img.youtube.com/vi/" + vidB.videoId + "/hqdefault.jpg";
+      return DATA.home.featuredImg || "";
+    }
+    function setFeatured(src) {
+      if (!src) return;
+      featuredImgEl.onerror = function() { this.onerror = null; this.src = getFallbackDriveUrl(src); };
+      featuredImgEl.src = src;
+    }
+    function applyBorder(el, b) {
+      const st = b.borderStyle !== undefined ? b.borderStyle : "dashed";
+      el.style.border = st === "none" ? "none" : (b.borderWidth || 1) + "px " + st + " " + (b.borderColor || "#111111");
+      el.style.borderRadius = b.borderRadius || "0px";
+    }
+    function render() {
+      categoryListEl.innerHTML = "";
+      DATA.categories.forEach(cat => {
+        const li = document.createElement("li");
+        li.className = "category-item" + (activeSectionId === cat.id ? " active" : "");
+        li.textContent = cat.name;
+        li.addEventListener("mouseenter", () => setFeatured(getSectionPreviewImage(cat)));
+        li.addEventListener("click", () => { activeSectionId = cat.id; render(); });
+        categoryListEl.appendChild(li);
+      });
+      homeBtn.className = "site-title" + (activeSectionId === "home" ? " active" : "");
+      const sec = activeSectionId === "home" ? DATA.home : DATA.categories.find(c => c.id === activeSectionId);
+      if (!sec) return;
+      currentViewLabelEl.textContent = sec.name;
+      setFeatured(getSectionPreviewImage(sec));
+      blocksContainerEl.innerHTML = "";
+      sec.blocks.forEach(b => {
+        const w = b.width || 100;
+        const mw = b.mobileWidth !== undefined ? b.mobileWidth : 100;
+        const align = b.align || "flow";
+        const bEl = document.createElement("div");
+        bEl.className = "block-item align-" + align + (b.hideMobile ? " mobile-hidden" : "");
+        bEl.style.setProperty("--mob-w", mw + "%");
+        bEl.style.setProperty("--mob-flow-w", mw >= 98 ? "100%" : "calc(" + mw + "% - 6px)");
+
+        const bIn = document.createElement("div");
+        bIn.className = "block-inner";
+        if (align === "sticker") {
+          bEl.style.width = w + "%";
+          bEl.style.left = (b.x || 40) + "px";
+          bEl.style.top = (b.y || 40) + "px";
+        } else if (align === "flow") {
+          bEl.style.width = w >= 98 ? "100%" : "calc(" + w + "% - 8px)";
+        } else {
+          bIn.style.width = w + "%";
+        }
+        if (b.type === "text") {
+          const d = document.createElement("div");
+          d.className = "text-block-content";
+          d.innerHTML = b.html || "";
+          applyBorder(d, b);
+          bIn.appendChild(d);
+        } else if (b.type === "spacer") {
+          const sp = document.createElement("div");
+          sp.className = "spacer-block-inner";
+          sp.style.height = (b.height || 30) + "px";
+          const ln = document.createElement("div");
+          ln.className = "spacer-line";
+          const st = b.borderStyle !== undefined ? b.borderStyle : "dashed";
+          ln.style.borderTop = st === "none" ? "none" : (b.borderWidth || 1) + "px " + st + " " + (b.borderColor || "#111111");
+          sp.appendChild(ln);
+          bIn.appendChild(sp);
+        } else if (b.type === "image") {
+          const fig = document.createElement("div");
+          fig.className = "image-block-figure";
+          const img = document.createElement("img");
+          img.src = b.src;
+          img.loading = "lazy";
+          applyBorder(img, b);
+          img.onerror = function() { this.onerror = null; this.src = getFallbackDriveUrl(b.src); };
+          img.addEventListener("click", () => openLb([b.src], 0, b.caption || ""));
+          fig.appendChild(img);
+          if (b.caption) {
+            const c = document.createElement("div");
+            c.className = "image-caption";
+            c.textContent = b.caption;
+            fig.appendChild(c);
+          }
+          bIn.appendChild(fig);
+        } else if (b.type === "youtube") {
+          const vw = document.createElement("div");
+          vw.className = "video-block-wrapper";
+          vw.style.aspectRatio = b.aspectRatio || "16 / 9";
+          applyBorder(vw, b);
+          const ifr = document.createElement("iframe");
+          ifr.src = "https://www.youtube.com/embed/" + b.videoId;
+          ifr.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+          ifr.allowFullscreen = true;
+          vw.appendChild(ifr);
+          bIn.appendChild(vw);
+          if (b.caption) {
+            const c = document.createElement("div");
+            c.className = "image-caption";
+            c.textContent = b.caption;
+            bIn.appendChild(c);
+          }
+        } else if (b.type === "grid") {
+          const gc = document.createElement("div");
+          gc.className = "grid-block-masonry";
+          gc.style.columnCount = b.cols || 3;
+          gc.style.setProperty("--mob-cols", b.mobileCols || 2);
+          (b.images || []).forEach((src, i) => {
+            const sub = document.createElement("div");
+            sub.className = "grid-sub-item";
+            const img = document.createElement("img");
+            img.src = src;
+            img.loading = "lazy";
+            applyBorder(img, b);
+            img.onerror = function() { this.onerror = null; this.src = getFallbackDriveUrl(src); };
+            img.addEventListener("click", () => openLb(b.images, i, ""));
+            sub.appendChild(img);
+            gc.appendChild(sub);
+          });
+          bIn.appendChild(gc);
+        }
+        bEl.appendChild(bIn);
+        blocksContainerEl.appendChild(bEl);
+      });
+    }
+    homeBtn.addEventListener("mouseenter", () => setFeatured(getSectionPreviewImage(DATA.home)));
+    homeBtn.addEventListener("click", () => { activeSectionId = "home"; render(); });
+    document.getElementById("lightboxClose").addEventListener("click", () => lightboxEl.classList.remove("open"));
+    lightboxEl.addEventListener("click", e => { if (e.target === lightboxEl) lightboxEl.classList.remove("open"); });
+    document.addEventListener("keydown", e => {
+      if (!lightboxEl.classList.contains("open")) return;
+      if (e.key === "Escape") lightboxEl.classList.remove("open");
+      if (e.key === "ArrowLeft") stepLb(-1);
+      if (e.key === "ArrowRight") stepLb(1);
+    });
+    render();
+  </script>
+</body>
+</html>
