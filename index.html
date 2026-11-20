@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>nikiri akerman</title>
   <link rel="icon" href="./favicon.ico?v=3">
 <link rel="shortcut icon" href="./favicon.ico?v=3">
   <style>
+    #plumas-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 90; /* Por encima del contenido, pero debajo del lightbox (100) */
+  pointer-events: none;
+}
     :root {
       --bg-color: #ffffff;
       --text-color: #111111;
@@ -83,6 +93,7 @@
       .lightbox-nav { top: auto; bottom: 20px; transform: none; padding: 6px 14px; }
       .lightbox-prev { left: 25%; }
       .lightbox-next { right: 25%; }
+
     }
   </style>
 </head>
@@ -304,6 +315,139 @@
       if (e.key === "ArrowRight") stepLb(1);
     });
     render();
+    <canvas id="plumas-canvas"></canvas>
+    // --- MOTOR DE FÍSICAS PARA PLUMAS ---
+(function iniciarPlumas() {
+  const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Query, Body, Events } = Matter;
+
+  const canvas = document.getElementById("plumas-canvas");
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+
+  const engine = Engine.create();
+  // Gravedad muy lenta y suave
+  engine.gravity.y = 0.04; 
+
+  const render = Render.create({
+    canvas: canvas,
+    engine: engine,
+    options: {
+      width: width,
+      height: height,
+      wireframes: false,
+      background: "transparent"
+    }
+  });
+
+  // Tus URLs de PNGs de plumas (puedes agregar más al array)
+  const urlsPlumas = [
+    "./pluma1.png",
+    "./pluma2.png",
+    "./pluma3.png"
+  ];
+
+  // Crear plumas con resistencia al aire (frictionAir) para que planeen lento
+  const plumas = [];
+  const cantidadPlumas = 12;
+
+  for (let i = 0; i < cantidadPlumas; i++) {
+    const url = urlsPlumas[i % urlsPlumas.length];
+    const escala = 0.15 + Math.random() * 0.15; // Ajusta esto según el tamaño real de tus PNGs
+    const x = Math.random() * (width - 100) + 50;
+    const y = -Math.random() * 500 - 50; // Empiezan escalonadas arriba
+
+    const pluma = Bodies.rectangle(x, y, 60, 25, {
+      restitution: 0.7,      // Rebote suave contra los bordes
+      frictionAir: 0.035,    // Resistencia del aire alta = caída lenta tipo pluma
+      density: 0.0005,
+      angle: Math.random() * Math.PI,
+      render: {
+        sprite: {
+          texture: url,
+          xScale: escala,
+          yScale: escala
+        }
+      }
+    });
+    plumas.push(pluma);
+  }
+
+  // Paredes invisibles en los 4 bordes de la pantalla
+  const grosorPared = 100;
+  let piso = Bodies.rectangle(width / 2, height + grosorPared / 2, width * 2, grosorPared, { isStatic: true, render: { visible: false } });
+  let techo = Bodies.rectangle(width / 2, -600, width * 2, grosorPared, { isStatic: true, render: { visible: false } });
+  let paredIzq = Bodies.rectangle(-grosorPared / 2, height / 2, grosorPared, height * 3, { isStatic: true, render: { visible: false } });
+  let paredDer = Bodies.rectangle(width + grosorPared / 2, height / 2, grosorPared, height * 3, { isStatic: true, render: { visible: false } });
+
+  Composite.add(engine.world, [...plumas, piso, techo, paredIzq, paredDer]);
+
+  // Movimiento de vaivén suave en el aire (efecto viento)
+  Events.on(engine, "beforeUpdate", () => {
+    const tiempo = engine.timing.timestamp * 0.001;
+    plumas.forEach((p, idx) => {
+      // Solo aplicar viento si no está tocando el piso quieto
+      if (p.speed > 0.15) {
+        const fuerzaViento = Math.sin(tiempo + idx) * 0.000015;
+        Body.applyForce(p, p.position, { x: fuerzaViento, y: 0 });
+      }
+    });
+  });
+
+  // Interacción: agarrar y arrastrar con mouse o touch
+  const mouse = Mouse.create(canvas);
+  const mouseConstraint = MouseConstraint.create(engine, {
+    mouse: mouse,
+    constraint: {
+      stiffness: 0.15,
+      render: { visible: false }
+    }
+  });
+  Composite.add(engine.world, mouseConstraint);
+
+  // Activar clics en el canvas SOLO cuando el puntero está encima de una pluma
+  function actualizarInteraccion(clientX, clientY) {
+    const punto = { x: clientX, y: clientY };
+    const tocandoPluma = Query.point(plumas, punto).length > 0;
+    if (tocandoPluma || mouseConstraint.body) {
+      canvas.style.pointerEvents = "auto";
+      canvas.style.cursor = mouseConstraint.body ? "grabbing" : "grab";
+    } else {
+      canvas.style.pointerEvents = "none";
+      canvas.style.cursor = "default";
+    }
+  }
+
+  window.addEventListener("mousemove", e => actualizarInteraccion(e.clientX, e.clientY));
+  window.addEventListener("touchstart", e => {
+    if (e.touches.length > 0) {
+      const t = e.touches[0];
+      actualizarInteraccion(t.clientX, t.clientY);
+    }
+  }, { passive: true });
+  window.addEventListener("touchend", () => {
+    setTimeout(() => { canvas.style.pointerEvents = "none"; }, 50);
+  });
+
+  // Ajustar paredes si se redimensiona la ventana
+  window.addEventListener("resize", () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+    render.options.width = width;
+    render.options.height = height;
+
+    Body.setPosition(piso, { x: width / 2, y: height + grosorPared / 2 });
+    Body.setPosition(paredDer, { x: width + grosorPared / 2, y: height / 2 });
+  });
+
+  Render.run(render);
+  const runner = Runner.create();
+  Runner.run(runner, engine);
+})();
   </script>
+        
 </body>
 </html>
