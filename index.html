@@ -345,42 +345,74 @@
       });
 
       const urlsPlumas = [
-        "./pluma1.png"
+        "./pluma2.png"
       ];
+
+      // Genera una versión con filtro hue-rotate para cada pluma
+      function crearTexturaHue(src, hueDeg, callback) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          const off = document.createElement("canvas");
+          off.width = img.width || 100;
+          off.height = img.height || 100;
+          const ctx = off.getContext("2d");
+          ctx.filter = "hue-rotate(" + hueDeg + "deg)";
+          ctx.drawImage(img, 0, 0);
+          callback(off.toDataURL());
+        };
+        img.onerror = () => callback(src);
+        img.src = src;
+      }
 
       const plumas = [];
       const cantidadPlumas = 12;
+      const tamanoFijo = 38; // Tamaño uniforme pequeño en píxeles
 
-      for (let i = 0; i < cantidadPlumas; i++) {
-        const url = urlsPlumas[i % urlsPlumas.length];
-        const escala = 0.15 + Math.random() * 0.15;
-        const x = Math.random() * (width - 100) + 50;
-        const y = -Math.random() * 500 - 50;
-
-        const pluma = Bodies.rectangle(x, y, 60, 25, {
-          restitution: 0.7,
-          frictionAir: 0.035,
-          density: 0.0005,
-          angle: Math.random() * Math.PI,
-          render: {
-            sprite: {
-              texture: url,
-              xScale: escala,
-              yScale: escala
-            }
-          }
-        });
-        plumas.push(pluma);
-      }
-
+      // Paredes invisibles en los 4 bordes de la pantalla
       const grosorPared = 100;
       let piso = Bodies.rectangle(width / 2, height + grosorPared / 2, width * 2, grosorPared, { isStatic: true, render: { visible: false } });
       let techo = Bodies.rectangle(width / 2, -600, width * 2, grosorPared, { isStatic: true, render: { visible: false } });
       let paredIzq = Bodies.rectangle(-grosorPared / 2, height / 2, grosorPared, height * 3, { isStatic: true, render: { visible: false } });
       let paredDer = Bodies.rectangle(width + grosorPared / 2, height / 2, grosorPared, height * 3, { isStatic: true, render: { visible: false } });
 
-      Composite.add(engine.world, [...plumas, piso, techo, paredIzq, paredDer]);
+      Composite.add(engine.world, [piso, techo, paredIzq, paredDer]);
 
+      for (let i = 0; i < cantidadPlumas; i++) {
+        const url = urlsPlumas[i % urlsPlumas.length];
+        const hueAleatorio = Math.floor(Math.random() * 360);
+
+        crearTexturaHue(url, hueAleatorio, (dataUrl) => {
+          const tempImg = new Image();
+          tempImg.onload = () => {
+            // Calcula la escala exacta para que todas midan lo mismo (tamanoFijo)
+            const ladoMayor = Math.max(tempImg.width, tempImg.height) || 100;
+            const escalaUniforme = tamanoFijo / ladoMayor;
+
+            const x = Math.random() * (width - 80) + 40;
+            const y = -Math.random() * 450 - 40;
+
+            const pluma = Bodies.rectangle(x, y, tamanoFijo, tamanoFijo * 0.45, {
+              restitution: 0.7,
+              frictionAir: 0.035,
+              density: 0.0005,
+              angle: Math.random() * Math.PI,
+              render: {
+                sprite: {
+                  texture: dataUrl,
+                  xScale: escalaUniforme,
+                  yScale: escalaUniforme
+                }
+              }
+            });
+            plumas.push(pluma);
+            Composite.add(engine.world, pluma);
+          };
+          tempImg.src = dataUrl;
+        });
+      }
+
+      // Movimiento de vaivén suave en el aire + rotación continua de hue
       Events.on(engine, "beforeUpdate", () => {
         const tiempo = engine.timing.timestamp * 0.001;
         plumas.forEach((p, idx) => {
@@ -390,6 +422,13 @@
           }
         });
       });
+
+      // Ciclo suave de cambio de hue en el canvas completo para que sigan mutando de color mientras caen
+      let hueCiclo = 0;
+      setInterval(() => {
+        hueCiclo = (hueCiclo + 2) % 360;
+        canvas.style.filter = "hue-rotate(" + hueCiclo + "deg)";
+      }, 80);
 
       const mouse = Mouse.create(canvas);
       const mouseConstraint = MouseConstraint.create(engine, {
